@@ -25,7 +25,7 @@ ofxTalairach::~ofxTalairach(){
 
 //------------------------------------------------------------------------------
 void ofxTalairach::setup(){
-	//connectT(); //TODO problems with connection, 
+	//connectT(); //TODO problems with connection, figure already binding and request are working without anyway..  
 }
 
 //------------------------------------------------------------------------------

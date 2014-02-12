@@ -1,4 +1,4 @@
-z<ofxTalairach
+ofxTalairach
 ========
 
 ![Screenshot](https://github.com/carlesgutierrez/ofxTalairach/raw/master/screen.png)
