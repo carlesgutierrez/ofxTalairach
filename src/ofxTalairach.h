@@ -44,6 +44,8 @@ public:
 	void setup();
 	void update();
 
+	//Key Mouse orders for a simple example
+	void mouseMoved(int x, int y );
 	void keyReleased(int key);
 	
 	//Drawers
@@ -51,36 +53,37 @@ public:
 	void drawRequestedLabels(vector<string> vlabels, int x, int y);
 	
 	//Getters
-	float getStructuralProbMap(ofVec3f pos); //(1)
-	vector<string> getLabels(ofVec3f pos); //(2)
-	vector<string> getLabelsArroundCube(ofVec3f pos, int _cubeSize); //(3)
+	float getStructuralProbMap(ofVec3f pos, bool blocalhost); //(1) Structural Probability Maps
+	vector<string> getLabels(ofVec3f pos, bool blocalhost); //(2) Talairach label 
+	vector<string> getLabelsArroundCube(ofVec3f pos, int _cubeSize, bool blocalhost); //(3) Talairach labels within a cube range
+	vector<string> getLabelsGrayMatter(ofVec3f pos); //(4) Talairach gray matter labels.
 	
-	//(4)
-	
-	//Utils 
-	inline bool existsFile (const std::string& name) {
-		return ( access( name.c_str(), F_OK ) != -1 );
-	}
 	
 private:	
 	//Connecting
 	void connectT();
 	bool bConnected;
 	
-	//Request
+	//Utils 
+	inline bool existsFile (const std::string& name) { return ( access( name.c_str(), F_OK ) != -1 ); }
+	
+	//Request Funtions
 	void requestTL(vector<string> &vlabel, string commandline);
 	string readBuffer4Label(char _buffer[]);
 	float requestSPM(string commandline);
 	float readBufferSPM(char _buffer[]);
 	
-	brainArea actualBrainArea;
-	
+	//Data used  to request
+	ofVec3f locBrain;
 	ofVec3f point3d;
 	int cubeSize;
-	float probMap;
 	string commnadline;
-		
+	
+	//Data returned
+	brainArea actualBrainArea;
+	float probMap;
 	vector<string> vectorLabelsAroundCube;
 	vector<string> vectorLabels;
+
 };
 
