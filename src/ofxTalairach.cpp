@@ -16,6 +16,9 @@ ofxTalairach::ofxTalairach(){
 	point3d = ofVec3f(0,0,0);
 	bConnected = false;
 	vectorLabels.clear();
+	vectorLabelsAroundCube.clear();
+	probMap = 0;
+	
 }
 
 //------------------------------------------------------------------------------
@@ -26,19 +29,40 @@ ofxTalairach::~ofxTalairach(){
 //------------------------------------------------------------------------------
 void ofxTalairach::setup(){
 	//connectT(); //TODO problems with connection, figure already binding and request are working without anyway..  
+	
 }
 
 //------------------------------------------------------------------------------
 void ofxTalairach::drawDebug(int x, int y){
 	
+	int yposProb = 80;
+	int yposLabel = 180;
+	int yposLabelCube = 300;
+	
+	//Info
 	ofDrawBitmapStringHighlight("Press '1','2', or '3' to get a sample with diferent data from The Talairach Client", x, y);
 	ofDrawBitmapStringHighlight("Press '+' or '-' for change the cubeSize request", x, y+MARGINTEXT);
 	
-	ofSetColor(10, 10, 10);
-	drawRequestProbMap(x, y+MARGINTEXT*3);
+	ofDrawBitmapStringHighlight("point requested " +ofToString(point3d), x, y+MARGINTEXT*2);
 	
+	//DaerProbability map
+	ofDrawBitmapStringHighlight("Probability Map: ", x, y+yposProb+ MARGINTEXT);
+	
+	string myBrainAreas[MAXITEMS] = {"Caudate", "Putamen", "Thalamus", "Insula", "Frontal lobe", "Temporal lobe", "Parietal lobe", "Occipital lobe", "Cerebellum"};
+	
+	ofDrawBitmapString(ofToString(actualBrainArea,2),x, y+yposProb+ MARGINTEXT*2 );
+	ofDrawBitmapString(ofToString(probMap,2),x, y+yposProb+ MARGINTEXT*3 );
+	
+
+	
+	//Labels
+	ofDrawBitmapStringHighlight("Labels: ", x, y+yposLabel);
 	ofSetColor(10, 10, 10);
-	drawRequestedLabels(x,y+MARGINTEXT+100);
+	drawRequestedLabels(vectorLabels, x,y+yposLabel);
+	
+	ofDrawBitmapStringHighlight("Labels with a cubeSize=: " + ofToString(cubeSize) , x, y+yposLabelCube);
+	ofSetColor(10, 10, 10);
+	drawRequestedLabels(vectorLabelsAroundCube, x,y+yposLabelCube);
 
 }
 
@@ -56,21 +80,14 @@ void ofxTalairach::connectT(){
 
 }
 
-//--------------------------------------------------------------
-void ofxTalairach::drawRequestProbMap(int x, int y){
-
-	ofDrawBitmapStringHighlight("Last requested Probability Map: " +ofToString(point3d), x, y);
-	ofDrawBitmapString(ofToString(probMap,2), x, y+MARGINTEXT);
-}
 
 //--------------------------------------------------------------
-void ofxTalairach::drawRequestedLabels(int x, int y){
+void ofxTalairach::drawRequestedLabels(vector<string> vlabels, int x, int y){
 	
-	ofDrawBitmapStringHighlight("Last requested Point: " +ofToString(point3d)+ " cubeSize= "+ ofToString(cubeSize) , x, y);
-	
-	for (int i=0; i<vectorLabels.size(); i++) {
-		ofDrawBitmapString(vectorLabels[i], x, i*MARGINTEXT + y + MARGINTEXT*2);
+	for (int i=0; i<vlabels.size(); i++) {
+		ofDrawBitmapString(vlabels[i], x, i*MARGINTEXT + y + MARGINTEXT*2);
 	}
+	
 }
 
 /*
@@ -100,7 +117,7 @@ float ofxTalairach::getStructuralProbMap(ofVec3f pos){
 }
 //--------------------------------------------------------------
 vector<string> ofxTalairach::getLabelsArroundCube(ofVec3f pos, int _cubeSize){
-	//Save last data used to request 
+	//Save last data used to request
 	point3d = pos;
 	cubeSize = _cubeSize;
 	
@@ -109,32 +126,39 @@ vector<string> ofxTalairach::getLabelsArroundCube(ofVec3f pos, int _cubeSize){
 	//commnadline += " 7,";// To set a different cube size, use "3:<cubesize>". Sizes of 3, 5, 7, 9 and 11 are accepted.
 	commnadline += cubeSizeStr;
 	
-	string cubePointStr = " "+ofToString(point3d.x,0)+", "+ofToString(point3d.y,0)+", "+ofToString(point3d.z,0);
+	string cubePointStr = " "+ofToString(pos.x,0)+", "+ofToString(pos.y,0)+", "+ofToString(pos.z,0);
 	//commnadline += " 15, 10, 8";
 	commnadline += cubePointStr;
-	requestTL(commnadline);
+	requestTL(vectorLabelsAroundCube, commnadline);
+	
+	return vectorLabelsAroundCube;
+}
+
+//--------------------------------------------------------------
+vector<string> ofxTalairach::getLabels(ofVec3f pos){
+	//Save last data used to request 
+	point3d = pos;
+	
+	commnadline = "java -cp ../../../data/talairach.jar org.talairach.PointToTD 2,";
+	string cubePointStr = " "+ofToString(pos.x,0)+", "+ofToString(pos.y,0)+", "+ofToString(pos.z,0);
+	commnadline += cubePointStr;
+	requestTL(vectorLabels, commnadline);
 	
 	return vectorLabels;
 }
 
-
-
-
 //--------------------------------------------------------------
-void ofxTalairach::requestTL(string commandline){
+void ofxTalairach::requestTL(vector<string> &vlabel, string commandline){
 	
-	vectorLabels.clear();
+	vlabel.clear();
 	
 	FILE *fp = popen(commandline.c_str(), "r");
 	
 	char buffer[1024];
 	while (fgets(buffer, sizeof(buffer), fp))
 	{
-		std::cout << "Output from program: " << buffer << '\n';
 		string resultBuffeRead = readBuffer4Label(buffer);
-		vectorLabels.push_back(resultBuffeRead);
-		
-		cout << "Size vectorLabels = " << vectorLabels.size() << endl;
+		vlabel.push_back(resultBuffeRead);
 	}
 	
 	pclose(fp);
@@ -146,7 +170,6 @@ string ofxTalairach::readBuffer4Label(char _buffer[]){
 	string resultsubbuff = "";
 	
 	if ( sizeof(_buffer) > 0 ){
-		cout << "Buffer reading Label= " << _buffer << endl;
 		resultsubbuff = ofToString(_buffer);		
 	}
 	
@@ -165,7 +188,7 @@ float ofxTalairach::requestSPM(string commandline){
 	while (fgets(buffer, sizeof(buffer), fp))
 	{
 		std::cout << "Output from program: " << buffer << '\n';
-		res = readBuffer4Caudate(buffer);
+		res = readBufferSPM(buffer);
 	}
 	
 	pclose(fp);
@@ -174,13 +197,29 @@ float ofxTalairach::requestSPM(string commandline){
 }
 
 //--------------------------------------------------------------
-float  ofxTalairach::readBuffer4Caudate(char _buffer[]){
+float  ofxTalairach::readBufferSPM(char _buffer[]){
 	
 	//ofVec3f location = ofVec3f(-1,-1,-1);
 	float myresult = -1;
 	
 	if (strncmp (_buffer,"Caudate ",8) == 0){
 		cout << "Caudate found= " << _buffer << endl;
+		
+		actualBrainArea = Caudate;
+		
+		//then copy my 5 interesant characters and return the desired variable 
+		char subbuff[6];
+		memcpy( subbuff, &_buffer[8], 5 );
+		subbuff[5] = '\0';
+		
+		string resultsubbuff(subbuff);
+		myresult = ofToFloat(resultsubbuff);
+		
+	}
+	if (strncmp (_buffer,"Putamen ",8) == 0){
+		cout << "Putamen found= " << _buffer << endl;
+		
+		actualBrainArea = Putamen;
 		
 		//then copy my 5 interesant characters and return the desired variable 
 		char subbuff[6];
@@ -199,30 +238,26 @@ float  ofxTalairach::readBuffer4Caudate(char _buffer[]){
 //--------------------------------------------------------------
 void ofxTalairach::keyReleased(int key){
 	
-	if(key == '1'){
-		getStructuralProbMap(ofVec3f(15, 10, 12));
+	switch (key) {
+		case '1':
+			getStructuralProbMap(ofVec3f(15, 10, 12));
+			break;
+		case '2':
+			getLabels(ofVec3f(15, 10, 8));
+			break;
+		case '3':
+			getLabelsArroundCube(ofVec3f(15, 10, 8), cubeSize);
+			break;
+		case OF_KEY_UP:
+			cubeSize += 2;
+			if (cubeSize > 11)cubeSize = 11;
+			break;
+		case OF_KEY_DOWN:
+			cubeSize -= 2;
+			if (cubeSize < 3)cubeSize = 3;
+			break;
+		default:
+			break;
 	}
-	else if(key == '3'){
-		getLabelsArroundCube(ofVec3f(15, 10, 8), cubeSize);
-		
-	}
-	else if(key == OF_KEY_UP){
-		cubeSize += 2;
-		
-		if (cubeSize > 11) {
-			cubeSize = 11;
-		}
-		
-		cout << "cubeSize= " << cubeSize << endl;
-	}
-	else if(key == OF_KEY_DOWN){
-		cubeSize -= 2;
-		
-		if (cubeSize < 3) {
-			cubeSize = 3;
-		}
-		
-		cout << "cubeSize= " << cubeSize << endl;
-		
-	}
+
 }

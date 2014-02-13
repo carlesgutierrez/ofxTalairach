@@ -23,14 +23,15 @@ For the moment the methods available are (1) and (3)
 The program is run as follows:
 
 (1) float getStructuralProbMap(ofVec3f pos);
+(2) vector<string> getLabels(ofVec3f pos);
 (3) vector<string> getLabelsArroundCube(ofVec3f pos, int sizecube);
 
+There is a example you can check for easy understanding of that functionalities.
 
 #License
 
-MIT License.
+Talairach data is free for educational and research purposes.
 
-For information on usage and redistribution, and for a DISCLAIMER OF ALL
-WARRANTIES, see the file, "LICENSE.txt," in this distribution.
+For commercial usage and redistribution, please contact with Dr. Lancaster from http://www.talairach.org/
 
 

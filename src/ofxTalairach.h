@@ -21,14 +21,22 @@
 // THE SOFTWARE.
 //
 // =============================================================================
+// Talairach http://www.talairach.org/manual.html
+// =============================================================================
+
+
 #pragma once
 
 #include "ofMain.h"
 #define MARGINTEXT 22
+#define MAXITEMS 10
+
 
 class ofxTalairach
 {
 public:
+	
+	enum brainArea {Caudate, Putamen, Thalamus, Insula, FrontalLobe, TemporalLobe, ParietalLobe, OccipitalLobe, Cerebellum};
 	
     ofxTalairach();
 	~ofxTalairach();
@@ -40,12 +48,14 @@ public:
 	
 	//Drawers
 	void drawDebug(int x, int y);
-	void drawRequestProbMap(int x, int y);
-	void drawRequestedLabels(int x, int y);
+	void drawRequestedLabels(vector<string> vlabels, int x, int y);
 	
 	//Getters
-	float getStructuralProbMap(ofVec3f pos);
-	vector<string> getLabelsArroundCube(ofVec3f pos, int _cubeSize);
+	float getStructuralProbMap(ofVec3f pos); //(1)
+	vector<string> getLabels(ofVec3f pos); //(2)
+	vector<string> getLabelsArroundCube(ofVec3f pos, int _cubeSize); //(3)
+	
+	//(4)
 	
 	//Utils 
 	inline bool existsFile (const std::string& name) {
@@ -58,18 +68,19 @@ private:
 	bool bConnected;
 	
 	//Request
-	void requestTL(string commandline);//(1) Structural Probability Maps, 
+	void requestTL(vector<string> &vlabel, string commandline);
 	string readBuffer4Label(char _buffer[]);
-	//...//(2) Talairach label, 
-	float requestSPM(string commandline);//(3) Talairach labels within a cube range
-	float readBuffer4Caudate(char _buffer[]);
-	//...//(4) Talairach gray matter labels.
+	float requestSPM(string commandline);
+	float readBufferSPM(char _buffer[]);
+	
+	brainArea actualBrainArea;
 	
 	ofVec3f point3d;
 	int cubeSize;
 	float probMap;
 	string commnadline;
 		
+	vector<string> vectorLabelsAroundCube;
 	vector<string> vectorLabels;
 };
 
