@@ -18,6 +18,7 @@ ofxTalairach::ofxTalairach(){
 	vectorLabels.clear();
 	vectorLabelsAroundCube.clear();
 	probMap = 0;
+	actualBrainArea = -1;
 	
 }
 
@@ -50,9 +51,10 @@ void ofxTalairach::drawDebug(int x, int y){
 	
 	string myBrainAreas[MAXITEMS] = {"Caudate", "Putamen", "Thalamus", "Insula", "Frontal lobe", "Temporal lobe", "Parietal lobe", "Occipital lobe", "Cerebellum"};
 	
-	ofDrawBitmapString(ofToString(actualBrainArea,2),x, y+yposProb+ MARGINTEXT*2 );
-	ofDrawBitmapString(ofToString(probMap,2),x, y+yposProb+ MARGINTEXT*3 );
-	
+	if(actualBrainArea>0){
+		ofDrawBitmapString(ofToString(myBrainAreas[actualBrainArea],2),x, y+yposProb+ MARGINTEXT*2 );
+		ofDrawBitmapString(ofToString(probMap,2),x, y+yposProb+ MARGINTEXT*3 );
+	}
 
 	
 	//Labels
