@@ -18,7 +18,7 @@ ofxTalairach::ofxTalairach(){
 	vectorLabels.clear();
 	vectorLabelsAroundCube.clear();
 	probMap = 0;
-	actualBrainArea = -1;
+	actualBrainArea = Noresult;
 	
 }
 
@@ -44,12 +44,13 @@ void ofxTalairach::drawDebug(int x, int y){
 	ofDrawBitmapStringHighlight("Press '1','2', or '3' to get a sample with diferent data from The Talairach Client", x, y);
 	ofDrawBitmapStringHighlight("Press '+' or '-' for change the cubeSize request", x, y+MARGINTEXT);
 	
-	ofDrawBitmapStringHighlight("point requested " +ofToString(point3d), x, y+MARGINTEXT*2);
+	ofDrawBitmapStringHighlight("Last point requested ", x, y+MARGINTEXT*2);
+	ofDrawBitmapString(ofToString(point3d), x, y+MARGINTEXT*3);
 	
 	//DaerProbability map
 	ofDrawBitmapStringHighlight("Probability Map: ", x, y+yposProb+ MARGINTEXT);
 	
-	string myBrainAreas[MAXITEMS] = {"Caudate", "Putamen", "Thalamus", "Insula", "Frontal lobe", "Temporal lobe", "Parietal lobe", "Occipital lobe", "Cerebellum"};
+	string myBrainAreas[MAXITEMS] = {"Noresult", "Caudate", "Putamen", "Thalamus", "Insula", "Frontal lobe", "Temporal lobe", "Parietal lobe", "Occipital lobe", "Cerebellum"};
 	
 	if(actualBrainArea>0){
 		ofDrawBitmapString(ofToString(myBrainAreas[actualBrainArea],2),x, y+yposProb+ MARGINTEXT*2 );

@@ -29,14 +29,14 @@
 
 #include "ofMain.h"
 #define MARGINTEXT 22
-#define MAXITEMS 10
+#define MAXITEMS 11
 
 
 class ofxTalairach
 {
 public:
 	
-	enum brainArea {Caudate, Putamen, Thalamus, Insula, FrontalLobe, TemporalLobe, ParietalLobe, OccipitalLobe, Cerebellum};
+	enum brainArea {Noresult, Caudate, Putamen, Thalamus, Insula, FrontalLobe, TemporalLobe, ParietalLobe, OccipitalLobe, Cerebellum};
 	
     ofxTalairach();
 	~ofxTalairach();
