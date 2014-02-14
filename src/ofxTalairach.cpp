@@ -21,6 +21,10 @@ ofxTalairach::ofxTalairach(){
 	actualBrainArea = Noresult;
 	locBrain = ofVec3f(0,0,0);
 	
+	localhost =		true;
+	isearchOption = 2;
+	command =		" org.talairach.PointToTD";
+	filepath =		"../../../data/talairach.jar";
 }
 
 //------------------------------------------------------------------------------
@@ -29,8 +33,39 @@ ofxTalairach::~ofxTalairach(){
 }
 
 //------------------------------------------------------------------------------
-void ofxTalairach::setup(){
-	connectT(); // Creates a local server  // It fails if there is already a local server running.  This server will sit and wait for connections forever.
+void ofxTalairach::setup(string _filepath){
+	filepath=_filepath;
+	//a check for a jar File Exitance
+	if(existsFile(filepath)){ // TODO This only will work for OSX systems
+		commandline = "java -cp "+ filepath +" org.talairach.AtlasServer 1600";
+		system(commandline.c_str());
+		bConnected = true; //TODO better to read buffer output to check connection message
+
+	}else {
+		cout << "ofxTalairach Error :: talairach.jar does not exist in bin/data folder" << endl;
+	}
+}
+
+//------------------------------------------------------------------------------
+void ofxTalairach::close(){
+	//a check for a jar File Exitance
+	if(bConnected){
+		commandline = "java -cp "+ filepath +" org.talairach.AtlasServer 1600";
+		system(commandline.c_str());
+		bConnected = false;
+	}
+}
+
+//--------------------------------------------------------------
+void ofxTalairach::connectT(){
+	//a check for a jar File Exitance
+	if(existsFile("../../../data/talairach.jar")){ // TODO This only will work for OSX systems
+		commandline = "java -cp ../../../data/talairach.jar org.talairach.AtlasServer 1600";
+		system(commandline.c_str());
+		bConnected = true; //TODO better to read buffer output to check connection message
+	}else {
+		cout << "ofxTalairach Error :: talairach.jar does not exist in bin/data folder" << endl;
+	}
 	
 }
 
@@ -52,7 +87,7 @@ void ofxTalairach::drawDebug(int x, int y){
 	//DaerProbability map
 	ofDrawBitmapStringHighlight("Probability Map: ", x, y+yposProb+ MARGINTEXT);
 	
-	//TODO this shoul be defined in header as static...
+	//TODO this should be defined in header as static...
 	string myBrainAreas[MAXITEMS] = {"Noresult", "Caudate", "Putamen", "Thalamus", "Insula", "Frontal lobe", "Temporal lobe", "Parietal lobe", "Occipital lobe", "Cerebellum"};
 	
 	if(actualBrainArea>0){
@@ -71,21 +106,6 @@ void ofxTalairach::drawDebug(int x, int y){
 
 }
 
-
-//--------------------------------------------------------------
-void ofxTalairach::connectT(){
-	//a check for a jar File Exitance
-	if(existsFile("../../../data/talairach.jar")){ // TODO This only will work for OSX systems
-		commnadline = "java -cp ../../../data/talairach.jar org.talairach.AtlasServer 1600";
-		system(commnadline.c_str());
-		bConnected = true; //TODO better to read buffer output to check connection message
-	}else {
-		cout << "ofxTalairach Error :: talairach.jar does not exist in bin/data folder" << endl;
-	}
-
-}
-
-
 //--------------------------------------------------------------
 void ofxTalairach::drawRequestedLabels(vector<string> vlabels, int x, int y){
 	
@@ -95,84 +115,115 @@ void ofxTalairach::drawRequestedLabels(vector<string> vlabels, int x, int y){
 	
 }
 
-/*
-void ofxTalairach::setSizeCube(int _sizecube){
-	//Sizes of 3, 5, 7, 9 and 11 are accepted.
-	if(_sizecube == 3 || _sizecube == 5 || _sizecube == 7 || _sizecube == 9 || _sizecube == 11){
-		cubeSize = _sizecube;
-	}
-	else {
-		cout << "ofxTalairach:: Set a cubeSize error. Only 3, 5, 7, 9 and 11 are accepted" << endl;
-	}
-
-}
- */
-
 //GETTERS
 //--------------------------------------------------------------
-float ofxTalairach::getStructuralProbMap(ofVec3f pos, bool local){
+vector<string> ofxTalairach::get(ofVec3f pos){
+
+	commandline =  "java -cp ";
+	commandline += filepath;
+	commandline += command;
+	commandline += slocalhost;
+	string slabelop;
+	if (isearchOption==3){
+		slabelop = " "+ofToString(isearchOption,0)+":" + " "+ofToString(cubeSize,0)+",";
+	}else{
+		slabelop = " "+ofToString(isearchOption,0)+",";
+	}
+	commandline += slabelop;
+	string cubePointStr =	  " " +ofToString(pos.x,0)
+							+ ", "+ofToString(pos.y,0)
+							+ ", "+ofToString(pos.z,0);
+	commandline += cubePointStr;
 	
-	point3d = ofVec3f(15, 10, 12);
-	if (local) {
+	cout << commandline << endl;
+	return	request(commandline); //request
+}
+
+//--------------------------------------------------------------
+float ofxTalairach::getStructuralProbMap(ofVec3f pos){
+	if (localhost) {
 		string slocalhost = " host=localhost:1600";
-		commnadline = "java -cp ../../../data/talairach.jar org.talairach.PointToTD";
+		commandline = "java -cp ../../../data/talairach.jar org.talairach.PointToTD";
 		string slabelop = " 1,";
-		commnadline += slocalhost;
-		commnadline += slabelop;
+		commandline += slocalhost;
+		commandline += slabelop;
 		
-	}else commnadline = "java -cp ../../../data/talairach.jar org.talairach.PointToTD 1,";
-	//commnadline += " 15, 10, 12";
+	}else commandline = "java -cp ../../../data/talairach.jar org.talairach.PointToTD 1,";
+	//commandline += " 15, 10, 12";
 	
 	string cubePointStr = " "+ofToString(pos.x,0)+", "+ofToString(pos.y,0)+", "+ofToString(pos.z,0);
-	commnadline += cubePointStr;
+	commandline += cubePointStr;
 	
-	probMap = requestSPM(commnadline);//Structural Probability Maps request
+	probMap = requestSPM(commandline);//Structural Probability Maps request
 	
 	return probMap;
 }
+
 //--------------------------------------------------------------
-vector<string> ofxTalairach::getLabelsArroundCube(ofVec3f pos, int _cubeSize, bool local){
+vector<string> ofxTalairach::getLabels(ofVec3f pos){
+	//Save last data used to request
+	point3d = pos;
+	
+	if (localhost) {
+		string slocalhost = " host=localhost:1600";
+		commandline = "java -cp ../../../data/talairach.jar org.talairach.PointToTD";
+		string slabelop = " 2,";
+		commandline += slocalhost;
+		commandline += slabelop;
+		
+	}else{
+		commandline = "java -cp ../../../data/talairach.jar org.talairach.PointToTD 2,";
+	}
+	string cubePointStr = " "+ofToString(pos.x,0)+", "+ofToString(pos.y,0)+", "+ofToString(pos.z,0);
+	commandline += cubePointStr;
+	requestTL(vectorLabels, commandline);
+	
+	return vectorLabels;
+}
+
+//--------------------------------------------------------------
+vector<string> ofxTalairach::getLabelsArroundCube(ofVec3f pos, int _cubeSize){
 	//Save last data used to request
 	point3d = pos;
 	cubeSize = _cubeSize;
 	
-	if (local) {
+	if (localhost) {
 		string slocalhost = " host=localhost:1600";
-		commnadline = "java -cp ../../../data/talairach.jar org.talairach.PointToTD";
+		commandline = "java -cp ../../../data/talairach.jar org.talairach.PointToTD";
 		string slabelop = " 3:";
-		commnadline += slocalhost;
-		commnadline += slabelop;
+		commandline += slocalhost;
+		commandline += slabelop;
 		
-	}else commnadline = "java -cp ../../../data/talairach.jar org.talairach.PointToTD 3:";
+	}else commandline = "java -cp ../../../data/talairach.jar org.talairach.PointToTD 3:";
 	string cubeSizeStr = " "+ofToString(cubeSize,0)+",";
-	//commnadline += " 7,";// To set a different cube size, use "3:<cubesize>". Sizes of 3, 5, 7, 9 and 11 are accepted.
-	commnadline += cubeSizeStr;
+	//commandline += " 7,";// To set a different cube size, use "3:<cubesize>". Sizes of 3, 5, 7, 9 and 11 are accepted.
+	commandline += cubeSizeStr;
 	
 	string cubePointStr = " "+ofToString(pos.x,0)+", "+ofToString(pos.y,0)+", "+ofToString(pos.z,0);
-	commnadline += cubePointStr;
-	requestTL(vectorLabelsAroundCube, commnadline);
+	commandline += cubePointStr;
+	requestTL(vectorLabelsAroundCube, commandline);
 	
 	return vectorLabelsAroundCube;
 }
 
 //--------------------------------------------------------------
-vector<string> ofxTalairach::getLabels(ofVec3f pos, bool local){
-	//Save last data used to request 
-	point3d = pos;
+vector<string> ofxTalairach::request(string commandline){
 	
-	if (local) {
-		string slocalhost = " host=localhost:1600";
-		commnadline = "java -cp ../../../data/talairach.jar org.talairach.PointToTD";
-		string slabelop = " 2,";
-		commnadline += slocalhost;
-		commnadline += slabelop;
-		
-	}else commnadline = "java -cp ../../../data/talairach.jar org.talairach.PointToTD 2,";
-	string cubePointStr = " "+ofToString(pos.x,0)+", "+ofToString(pos.y,0)+", "+ofToString(pos.z,0);
-	commnadline += cubePointStr;
-	requestTL(vectorLabels, commnadline);
+	FILE *fp = popen(commandline.c_str(), "r");
+	vector<string> labels;
+	string resultsubbuff;
 	
-	return vectorLabels;
+	char buffer[1024];
+	while (fgets(buffer, sizeof(buffer), fp))
+	{
+		if ( sizeof(buffer) > 0 ){
+			resultsubbuff = ofToString(buffer);
+		}
+		labels.push_back(resultsubbuff);
+	}
+	
+	pclose(fp);
+	return labels;
 }
 
 //--------------------------------------------------------------
@@ -308,36 +359,42 @@ float  ofxTalairach::readBufferSPM(char _buffer[]){
 }
 
 //--------------------------------------------------------------
-void ofxTalairach::mouseMoved(int x, int y){
-	//Map Mouse position and search X, Y around 0 and 200
-	locBrain.x = ofMap(x, 0, ofGetWidth(), 0, 200, false);
-	locBrain.y = ofMap(y, 0, ofGetWidth(), 0, 200, false);
-	locBrain.z = 8;//ofMap(mouseY, 0, ofGetWidth(), 0, 200, true);
-}	
+void ofxTalairach::setLocalhost(bool _host){
+	localhost = _host;
+	if (localhost==true){
+		slocalhost = " host=localhost:1600";
+	}else{
+		slocalhost = "";
+	}
+}
 
 //--------------------------------------------------------------
-void ofxTalairach::keyReleased(int key){
+void ofxTalairach::setSearchOption(int _searchOption){
 	
-	switch (key) {
-		case '1':
-			getStructuralProbMap(locBrain, false); //TODO local true don return results... 
-			break;
-		case '2':
-			getLabels(locBrain, true);
-			break;
-		case '3':
-			getLabelsArroundCube(locBrain, cubeSize, true); //15, 10, 8
-			break;
-		case OF_KEY_UP:
-			cubeSize += 2;
-			if (cubeSize > 11)cubeSize = 11;
-			break;
-		case OF_KEY_DOWN:
-			cubeSize -= 2;
-			if (cubeSize < 3)cubeSize = 3;
-			break;
-		default:
-			break;
+	if (_searchOption>0 && _searchOption<4){
+		isearchOption = _searchOption;
+	}else{
+		cout << "search option must be 1 , 2 or 3";
 	}
-
 }
+
+void ofxTalairach::setSizeCube(int _sizecube){
+	//Sizes of 3, 5, 7, 9 and 11 are accepted.
+	if(_sizecube == 3 || _sizecube == 5 || _sizecube == 7 || _sizecube == 9 || _sizecube == 11){
+		cubeSize = _sizecube;
+	}
+	else {
+		cout << "ofxTalairach:: Set a cubeSize error. Only 3, 5, 7, 9 and 11 are accepted" << endl;
+	}
+}
+
+
+
+
+
+
+
+
+
+
+

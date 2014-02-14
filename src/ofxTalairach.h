@@ -41,9 +41,11 @@ public:
     ofxTalairach();
 	~ofxTalairach();
 	
-	void setup();
+	void setup(string _filepath);
 	void update();
-
+	void close();
+	void connectT();
+	
 	//Key Mouse orders for a simple example
 	void mouseMoved(int x, int y );
 	void keyReleased(int key);
@@ -53,16 +55,27 @@ public:
 	void drawRequestedLabels(vector<string> vlabels, int x, int y);
 	
 	//Getters
-	float getStructuralProbMap(ofVec3f pos, bool blocalhost); //(1) Structural Probability Maps
-	vector<string> getLabels(ofVec3f pos, bool blocalhost); //(2) Talairach label 
-	vector<string> getLabelsArroundCube(ofVec3f pos, int _cubeSize, bool blocalhost); //(3) Talairach labels within a cube range
+	float getStructuralProbMap(ofVec3f pos); //(1) Structural Probability Maps
+	vector<string> getLabels(ofVec3f pos); //(2) Talairach label
+	vector<string> getLabelsArroundCube(ofVec3f pos, int _cubeSize); //(3) Talairach labels within a cube range
 	vector<string> getLabelsGrayMatter(ofVec3f pos); //(4) Talairach gray matter labels.
 	
+	vector<string>	get(ofVec3f pos);
+	vector<string> request(string commandline);
+	
+	//Setters
+	void setLocalhost(bool host);
+	void setSearchOption(int searchOption);
+	void setSizeCube(int _sizecube);
 	
 private:	
 	//Connecting
-	void connectT();
-	bool bConnected;
+	bool	bConnected;
+	bool	localhost;
+	string	slocalhost;
+	int		isearchOption;
+	string filepath;
+	string command;
 	
 	//Utils 
 	inline bool existsFile (const std::string& name) { return ( access( name.c_str(), F_OK ) != -1 ); }
@@ -77,7 +90,7 @@ private:
 	ofVec3f locBrain;
 	ofVec3f point3d;
 	int cubeSize;
-	string commnadline;
+	string commandline;
 	
 	//Data returned
 	brainArea actualBrainArea;
@@ -85,5 +98,6 @@ private:
 	vector<string> vectorLabelsAroundCube;
 	vector<string> vectorLabels;
 
+	
 };
 
