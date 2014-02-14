@@ -24,6 +24,8 @@
 // Talairach http://www.talairach.org/manual.html
 // =============================================================================
 
+// if you want to check if some app is useing the port used here, try this in terminal
+// lsof -n -i4TCP:1600 | grep LISTEN
 
 #pragma once
 

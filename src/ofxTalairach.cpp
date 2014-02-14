@@ -23,12 +23,15 @@ ofxTalairach::ofxTalairach(){
 	
 	localhost =		true;
 	isearchOption = 2;
+	slocalhost = " host=localhost:1600";
 	command =		" org.talairach.PointToTD";
 	filepath =		"../../../data/talairach.jar";
 }
 
 //------------------------------------------------------------------------------
 ofxTalairach::~ofxTalairach(){
+	
+	//TODO: we must find a way to close the daemon
 	
 }
 
@@ -40,7 +43,6 @@ void ofxTalairach::setup(string _filepath){
 		commandline = "java -cp "+ filepath +" org.talairach.AtlasServer 1600";
 		system(commandline.c_str());
 		bConnected = true; //TODO better to read buffer output to check connection message
-
 	}else {
 		cout << "ofxTalairach Error :: talairach.jar does not exist in bin/data folder" << endl;
 	}
@@ -140,6 +142,26 @@ vector<string> ofxTalairach::get(ofVec3f pos){
 }
 
 //--------------------------------------------------------------
+vector<string> ofxTalairach::request(string commandline){
+	
+	FILE *fp = popen(commandline.c_str(), "r");
+	vector<string> labels;
+	string resultsubbuff;
+	
+	char buffer[1024];
+	while (fgets(buffer, sizeof(buffer), fp))
+	{
+		if ( sizeof(buffer) > 0 ){
+			resultsubbuff = ofToString(buffer);
+		}
+		labels.push_back(resultsubbuff);
+	}
+	
+	pclose(fp);
+	return labels;
+}
+
+//--------------------------------------------------------------
 float ofxTalairach::getStructuralProbMap(ofVec3f pos){
 	if (localhost) {
 		string slocalhost = " host=localhost:1600";
@@ -207,26 +229,6 @@ vector<string> ofxTalairach::getLabelsArroundCube(ofVec3f pos, int _cubeSize){
 }
 
 //--------------------------------------------------------------
-vector<string> ofxTalairach::request(string commandline){
-	
-	FILE *fp = popen(commandline.c_str(), "r");
-	vector<string> labels;
-	string resultsubbuff;
-	
-	char buffer[1024];
-	while (fgets(buffer, sizeof(buffer), fp))
-	{
-		if ( sizeof(buffer) > 0 ){
-			resultsubbuff = ofToString(buffer);
-		}
-		labels.push_back(resultsubbuff);
-	}
-	
-	pclose(fp);
-	return labels;
-}
-
-//--------------------------------------------------------------
 void ofxTalairach::requestTL(vector<string> &vlabel, string commandline){
 	
 	vlabel.clear();
@@ -266,7 +268,7 @@ float ofxTalairach::requestSPM(string commandline){
 	char buffer[128];
 	while (fgets(buffer, sizeof(buffer), fp))
 	{
-		std::cout << "Output from program: " << buffer << '\n';
+		std::cout << "Output: " << buffer << '\n';
 		res = readBufferSPM(buffer);
 	}
 	
