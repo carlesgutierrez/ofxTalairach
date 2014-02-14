@@ -22,4 +22,6 @@ class ofApp : public ofBaseApp{
 		void gotMessage(ofMessage msg);
 	
 		ofxTalairach myTalairach;
+		ofVec3f		locBrain;
+		int cubeSize;
 };

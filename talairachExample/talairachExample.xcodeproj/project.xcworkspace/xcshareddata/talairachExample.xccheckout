@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
+	<false/>
+	<key>IDESourceControlProjectIdentifier</key>
+	<string>75C3CC4C-0A85-4FD4-9001-3CE4F2BC29AC</string>
+	<key>IDESourceControlProjectName</key>
+	<string>talairachExample</string>
+	<key>IDESourceControlProjectOriginsDictionary</key>
+	<dict>
+		<key>1BA89CD7-AA06-48AF-9FFC-8829366D4283</key>
+		<string>https://github.com/wasawi/ofxTalairach.git</string>
+		<key>1D8F693C-9553-475F-929B-AB7E7EC66D15</key>
+		<string>ssh://github.com/wasawi/openFrameworks.git</string>
+	</dict>
+	<key>IDESourceControlProjectPath</key>
+	<string>addons/ofxTalairach/talairachExample/talairachExample.xcodeproj/project.xcworkspace</string>
+	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
+	<dict>
+		<key>1BA89CD7-AA06-48AF-9FFC-8829366D4283</key>
+		<string>../../..</string>
+		<key>1D8F693C-9553-475F-929B-AB7E7EC66D15</key>
+		<string>../../../../..</string>
+	</dict>
+	<key>IDESourceControlProjectURL</key>
+	<string>https://github.com/wasawi/ofxTalairach.git</string>
+	<key>IDESourceControlProjectVersion</key>
+	<integer>110</integer>
+	<key>IDESourceControlProjectWCCIdentifier</key>
+	<string>1D8F693C-9553-475F-929B-AB7E7EC66D15</string>
+	<key>IDESourceControlProjectWCConfigurations</key>
+	<array>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>1BA89CD7-AA06-48AF-9FFC-8829366D4283</string>
+			<key>IDESourceControlWCCName</key>
+			<string>ofxTalairach</string>
+		</dict>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>1D8F693C-9553-475F-929B-AB7E7EC66D15</string>
+			<key>IDESourceControlWCCName</key>
+			<string>openFrameworks</string>
+		</dict>
+	</array>
+</dict>
+</plist>
